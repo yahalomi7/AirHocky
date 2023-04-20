@@ -90,10 +90,10 @@ public class Client extends Thread {
                         gameFrame.panel.score.player1 = dataServer.scorePlayer1;
                         gameFrame.panel.score.player2 = dataServer.scorePlayer2;
                         gameFrame.panel.paddle2.y = dataServer.yPaddle;
-                        gameFrame.panel.ball.x = dataServer.xBall;
-                        gameFrame.panel.ball.y = dataServer.yBall;
-                        gameFrame.panel.ball.xVelocity = dataServer.xVelocity;
-                        gameFrame.panel.ball.yVelocity = dataServer.yVelocity;
+                        gameFrame.panel.ball1.x = dataServer.xBall;
+                        gameFrame.panel.ball1.y = dataServer.yBall;
+                        gameFrame.panel.ball1.xVelocity = dataServer.xVelocity;
+                        gameFrame.panel.ball1.yVelocity = dataServer.yVelocity;
                     } catch (IOException | ClassNotFoundException ignored) {
                     }
 

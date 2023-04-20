@@ -21,11 +21,17 @@ public class GamePanel extends JPanel implements Runnable {
     Random random;
     public Paddle paddle1;
     public Paddle paddle2;
-    public Ball ball;
+    public Paddle paddle3;
+    public Ball ball1;
+    public Ball ball2;
     public Score score;
     Timer timer;
-    static final int GAME_DURATION = 300000; // 30 seconds in milliseconds
+    static final int GAME_DURATION = 60000; // 30 seconds in milliseconds
+    static final int GAME_DURATION2 = 30000; // 30 seconds in milliseconds
+
     boolean gameEnded = false;
+    Clock clock;
+
 
 
     GamePanel() {
@@ -34,7 +40,7 @@ public class GamePanel extends JPanel implements Runnable {
         score = new Score(GAME_WIDTH, GAME_HEIGHT);
         this.setFocusable(true);
         this.addKeyListener(new AL());
-        //this.addKeyListener(new ALD());
+
         this.setPreferredSize(SCREEN_SIZE);
 
         gameThread = new Thread(this);
@@ -43,13 +49,28 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void newBall() {
         random = new Random();
-        ball = new Ball((GAME_WIDTH / 2) - (BALL_DIAMETER / 2), random.nextInt(GAME_HEIGHT - BALL_DIAMETER), BALL_DIAMETER, BALL_DIAMETER);
+        ball1 = new Ball((GAME_WIDTH / 2) - (BALL_DIAMETER / 2), random.nextInt(GAME_HEIGHT - BALL_DIAMETER), BALL_DIAMETER, BALL_DIAMETER);
+        ball2 = new Ball((GAME_WIDTH / 2) - (BALL_DIAMETER / 2), random.nextInt((GAME_HEIGHT - BALL_DIAMETER)+2), BALL_DIAMETER, BALL_DIAMETER);
+
 
     }
+    class EndGameTask extends TimerTask {
+        public void run() {
+            // stop the game and display the result
+           if(score.player1>score.player2){
+               System.out.println("player1 won");
+           }
+           else{
+               System.out.println("player 2 won");
+           }
+            timer.cancel();
+            gameEnded =true;
+        }
+    }
+
     public void run() {
         timer = new Timer();
         timer.schedule(new EndGameTask(), GAME_DURATION);
-
         while (!gameEnded) {
             move();
             checkCollision();
@@ -60,22 +81,27 @@ public class GamePanel extends JPanel implements Runnable {
             }
             repaint();
         }
-    }
-
-
-
-    class EndGameTask extends TimerTask {
-        public void run() {
-            // stop the game and display the result
-            System.out.println("Time's up!");
-            timer.cancel();
-            gameEnded =true;
+        if (gameEnded=true&&score.player2==score.player1){
+            while (score.player2==score.player1) {
+                move();
+                checkCollision();
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                repaint();
+            }
         }
     }
+
+
 
     public void newPaddles() {
         paddle1 = new Paddle(0, (GAME_HEIGHT / 2) - (PADDLE_HEIGHT / 2), PADDLE_WIDTH, PADDLE_HEIGHT, 1);
         paddle2 = new Paddle(GAME_WIDTH - PADDLE_WIDTH, (GAME_HEIGHT / 2) - (PADDLE_HEIGHT / 2), PADDLE_WIDTH, PADDLE_HEIGHT, 2);
+        paddle3 = new Paddle(((GAME_WIDTH/2)-10), (GAME_HEIGHT / 2), 20, PADDLE_HEIGHT, 3);
+
     }
 
     public void paint(Graphics g) {
@@ -88,8 +114,11 @@ public class GamePanel extends JPanel implements Runnable {
     public void draw(Graphics g) {
         paddle1.draw(g);
         paddle2.draw(g);
-        ball.draw(g);
+        paddle3.draw(g);
+        ball1.draw(g);
+        ball2.draw(g);
         score.draw(g);
+        //clock.draw(g);
         Toolkit.getDefaultToolkit().sync(); // I forgot to add this line of code in the video, it helps with the animation
 
     }
@@ -97,38 +126,99 @@ public class GamePanel extends JPanel implements Runnable {
     public void move() {
         paddle1.move();
         paddle2.move();
-        ball.move();
+        paddle3.move();
+        ball1.move();
+        ball2.move();
     }
 
     public void checkCollision() {
-
         //bounce ball off top & bottom window edges
-        if (ball.y <= 0) {
-            ball.setYDirection(-ball.yVelocity);
+        if (ball1.y <= 0) {
+            ball1.setYDirection(-ball1.yVelocity);
         }
-        if (ball.y >= GAME_HEIGHT - BALL_DIAMETER) {
-            ball.setYDirection(-ball.yVelocity);
+        if (ball1.y >= GAME_HEIGHT - BALL_DIAMETER) {
+            ball1.setYDirection(-ball1.yVelocity);
         }
         //bounce ball off paddles
-        if (ball.intersects(paddle1)) {
-            ball.xVelocity = Math.abs(ball.xVelocity);
-            ball.xVelocity++; //optional for more difficulty
-            if (ball.yVelocity > 0)
-                ball.yVelocity++; //optional for more difficulty
+        if (ball1.intersects(paddle1)) {
+            ball1.xVelocity = Math.abs(ball1.xVelocity);
+            ball1.xVelocity++; //optional for more difficulty
+            if (ball1.yVelocity > 0)
+                ball1.yVelocity++; //optional for more difficulty
             else
-                ball.yVelocity--;
-            ball.setXDirection(ball.xVelocity);
-            ball.setYDirection(ball.yVelocity);
+                ball1.yVelocity--;
+            ball1.setXDirection(ball1.xVelocity);
+            ball1.setYDirection(ball1.yVelocity);
         }
-        if (ball.intersects(paddle2)) {
-            ball.xVelocity = Math.abs(ball.xVelocity);
-            ball.xVelocity++; //optional for more difficulty
-            if (ball.yVelocity > 0)
-                ball.yVelocity++; //optional for more difficulty
+        if (ball1.intersects(paddle2)) {
+            ball1.xVelocity = Math.abs(ball1.xVelocity);
+            ball1.xVelocity++; //optional for more difficulty
+            if (ball1.yVelocity > 0)
+                ball1.yVelocity++; //optional for more difficulty
             else
-                ball.yVelocity--;
-            ball.setXDirection(-ball.xVelocity);
-            ball.setYDirection(ball.yVelocity);
+                ball1.yVelocity--;
+            ball1.setXDirection(-ball1.xVelocity);
+            ball1.setYDirection(ball1.yVelocity);
+        }
+            if (ball1.intersects(paddle3)) {
+                ball1.xVelocity = Math.abs(ball1.xVelocity);
+                ball1.xVelocity++; //optional for more difficulty
+                if (ball1.yVelocity > 0)
+                    ball1.yVelocity++; //optional for more difficulty
+                else
+                    ball1.yVelocity--;
+                ball1.setXDirection(ball1.xVelocity);
+                ball1.setYDirection(ball1.yVelocity);
+            }
+            if (ball1.x <= 0) {
+                score.player2++;
+                newPaddles();
+                newBall();
+            }
+            if (ball1.x >= GAME_WIDTH - BALL_DIAMETER) {
+                score.player1++;
+                newPaddles();
+                newBall();
+            }
+
+        if (ball2.y <= 0) {
+            ball2.setYDirection(-ball2.yVelocity);
+        }
+        if (ball2.y >= GAME_HEIGHT - BALL_DIAMETER) {
+            ball2.setYDirection(-ball2.yVelocity);
+        }
+        //bounce ball off paddles
+        if (ball2.intersects(paddle1)) {
+            ball2.xVelocity = Math.abs(ball2.xVelocity);
+            ball2.xVelocity++; //optional for more difficulty
+            if (ball2.yVelocity > 0)
+                ball2.yVelocity++; //optional for more difficulty
+            else
+                ball2.yVelocity--;
+            ball2.setXDirection(ball2.xVelocity);
+            ball2.setYDirection(ball2.yVelocity);
+        }
+        if (ball2.intersects(paddle2)) {
+            ball2.xVelocity = Math.abs(ball2.xVelocity);
+            ball2.xVelocity++; //optional for more difficulty
+            if (ball2.yVelocity > 0)
+                ball2.yVelocity++; //optional for more difficulty
+            else
+                ball2.yVelocity--;
+            ball2.setXDirection(-ball2.xVelocity);
+            ball2.setYDirection(ball2.yVelocity);
+
+        }
+        if (ball2.intersects(paddle3)) {
+            ball2.xVelocity = Math.abs(ball2.xVelocity);
+            ball2.xVelocity++; //optional for more difficulty
+            if (ball2.yVelocity > 0)
+                ball2.yVelocity++; //optional for more difficulty
+            else
+                ball2.yVelocity--;
+            ball2.setXDirection(-ball2.xVelocity);
+            ball2.setYDirection(ball2.yVelocity);
+
         }
         //stops paddles at window edges
         if (paddle1.y <= 0)
@@ -139,18 +229,32 @@ public class GamePanel extends JPanel implements Runnable {
             paddle2.y = 0;
         if (paddle2.y >= (GAME_HEIGHT - PADDLE_HEIGHT))
             paddle2.y = GAME_HEIGHT - PADDLE_HEIGHT;
+        if (paddle3.y <= 0)
+            paddle3.y = 0;
+        if (paddle3.y >= (GAME_HEIGHT - PADDLE_HEIGHT))
+            paddle3.y = GAME_HEIGHT - PADDLE_HEIGHT;
+
         //give a player 1 point and creates new paddles & ball
-        if (ball.x <= 0) {
+        if (ball2.x <= 0) {
             score.player2++;
             newPaddles();
             newBall();
         }
-        if (ball.x >= GAME_WIDTH - BALL_DIAMETER) {
+        if (ball2.x >= GAME_WIDTH - BALL_DIAMETER) {
             score.player1++;
             newPaddles();
             newBall();
         }
-    }
+        paddle3.yVelocity=3;
+
+        if (paddle3.y <= 0) {
+            paddle3.setYDirection(-paddle3.yVelocity);
+        }
+        if (paddle3.y >= GAME_HEIGHT - PADDLE_HEIGHT) {
+            paddle3.setYDirection(-paddle3.yVelocity);
+        }
+
+        }
 
     public class AL extends KeyAdapter {
         public void keyPressed(KeyEvent e) {

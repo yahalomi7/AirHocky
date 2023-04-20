@@ -60,7 +60,7 @@ public class Server extends Thread {
                 while (true) {
 
                     // write a Data object to the client
-                    DataServer dataServer = new DataServer(gameFrame.panel.ball, gameFrame.panel.paddle2, gameFrame.panel.score);
+                    DataServer dataServer = new DataServer(gameFrame.panel.ball1, gameFrame.panel.paddle2, gameFrame.panel.score);
                     try {
                         outputStream.writeObject(dataServer);
                         System.out.println("Sent data to client: " + dataServer.yPaddle);

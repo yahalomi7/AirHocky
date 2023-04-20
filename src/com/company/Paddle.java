@@ -61,10 +61,12 @@ public class Paddle extends Rectangle{
         y= y + yVelocity;
     }
     public void draw(Graphics g) {
-        if(id==1)
-            g.setColor(Color.blue);
-        else
-            g.setColor(Color.red);
+        if(id==1){
+            g.setColor(Color.blue);}
+        if(id==2){
+            g.setColor(Color.red);}
+        if(id==3){
+            g.setColor(Color.yellow);}
         g.fillRect(x, y, width, height);
     }
 }
